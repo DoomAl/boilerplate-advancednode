@@ -10,8 +10,10 @@ async function main(callback) {
         // Connect to the MongoDB cluster
         await client.connect();
 
+        await callback(client)
+    // perform actions on the collection object
+
         // Make the appropriate DB calls
-        await callback(client);
 
     } catch (e) {
         // Catch any errors
