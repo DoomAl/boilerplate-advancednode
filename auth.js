@@ -20,11 +20,18 @@ module.exports = function (app, myDataBase) {
     function(username, password, done) {
       myDataBase.findOne({ username: username }, function(err, user) {
         console.log('User ' + username + ' attempted to log in.');
-        if (err) { return done(err); }
-        if (!user) { return done(null, false); }
-        if (!bcrypt.compareSync(password, user.password)) { 
+        if (err) { 
+          console.log("primer error");
+          return done(err); }
+        if (!user) {           
+          console.log("segundo error");
+          return done(null, false); 
+        }
+        if (!password === user.password) {
+          console.log("falla en el bcrypt local strategy") 
           return done(null, false);
-        }        
+        }    
+        console.log("me devuelve el puto user", user)    
         return done(null, user);
       });
     }
