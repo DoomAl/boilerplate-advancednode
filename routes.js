@@ -2,7 +2,16 @@ const passport = require('passport');
 const bcrypt = require('bcrypt');
 
 module.exports = function (app, myDataBase) {
-  // Be sure to change the title
+
+// Be sure to change the title
+  app.route('/login').post(passport.authenticate('local', { successRedirect: '/profile', failureRedirect: '/'}));
+
+  app.route('/profile').get(ensureAuthenticated, (req, res) => {
+    res.render(process.cwd() + '/views/pug/profile', {
+      username: req.user.username
+    });
+  });
+
   app.route('/').get((req, res) => {
     //Change the response to render the Pug template
     res.render(process.cwd() + '/views/pug', {
@@ -10,16 +19,6 @@ module.exports = function (app, myDataBase) {
       message: 'Please login',
       showLogin: true,
       showRegistration: true
-    });
-  });
-
-  app.route('/login').post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
-    res.redirect('/profile');
-  });
-
-  app.route('/profile').get(ensureAuthenticated, (req, res) => {
-    res.render(process.cwd() + '/views/pug/profile', {
-      username: req.user.username
     });
   });
 
@@ -37,8 +36,7 @@ module.exports = function (app, myDataBase) {
       } else {
         myDataBase.insertOne({
           username: req.body.username,
-          password: req.body.password
-          //bcrypt.hashSync(req.body.password, 12)
+          password: bcrypt.hashSync(req.body.password, 12)
         },
           (err, doc) => {
             if (err) {
@@ -67,10 +65,7 @@ module.exports = function (app, myDataBase) {
 }
 
 function ensureAuthenticated(req, res, next) {
-  console.log("before isAUth");
-  console.log(req.isAuthenticated());
   if (req.isAuthenticated()) {
-    console.log("is auth")
     return next();
   }
   res.redirect('/');
