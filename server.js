@@ -5,8 +5,7 @@ const myDB = require('./connection');
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
 const session = require('express-session');
 const passport = require('passport');
-const ObjectID = require('mongodb').ObjectID;
-const routes = require('./routes.js');
+const routes = require('./routes');
 const auth = require('./auth.js');
 
 const app = express();
@@ -31,8 +30,8 @@ app.use(passport.session());
 myDB(async client => {
   const myDataBase = await client.db('sample_airbnb').collection('users');
 
-  auth(app, myDataBase);
   routes(app, myDataBase);
+  auth(app, myDataBase);
 
   // Be sure to add this...
 }).catch(e => {

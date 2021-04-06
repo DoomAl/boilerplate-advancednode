@@ -4,7 +4,9 @@ const bcrypt = require('bcrypt');
 module.exports = function (app, myDataBase) {
 
 // Be sure to change the title
-  app.route('/login').post(passport.authenticate('local', { successRedirect: '/profile', failureRedirect: '/'}));
+  app.route('/login').post(passport.authenticate('local', { failureRedirect: '/'}), (req, res) => {
+    res.redirect('/profile');
+  });
 
   app.route('/profile').get(ensureAuthenticated, (req, res) => {
     res.render(process.cwd() + '/views/pug/profile', {
@@ -18,7 +20,8 @@ module.exports = function (app, myDataBase) {
       title: 'Connected to Database',
       message: 'Please login',
       showLogin: true,
-      showRegistration: true
+      showRegistration: true,
+      showSocialAuth: true
     });
   });
 
@@ -56,8 +59,17 @@ module.exports = function (app, myDataBase) {
       res.redirect('/profile');
     }
   );
-  
-    app.use((req, res, next) => {
+
+
+  app.route('/auth/github').get(
+    passport.authenticate('github')
+  );
+
+  app.route('/auth/github/callback').get(passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
+    res.redirect('/profile');
+  });
+
+  app.use((req, res, next) => {
     res.status(404)
       .type('text')
       .send('Not Found');
@@ -65,8 +77,11 @@ module.exports = function (app, myDataBase) {
 }
 
 function ensureAuthenticated(req, res, next) {
+  console.log("Before Auth");
+  console.log("req.isAuthenticated():", req.isAuthenticated());
   if (req.isAuthenticated()) {
     return next();
   }
+  console.log("redirige a /");
   res.redirect('/');
 };
