@@ -66,7 +66,14 @@ module.exports = function (app, myDataBase) {
   );
 
   app.route('/auth/github/callback').get(passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
-    res.redirect('/profile');
+    req.session.user_id = req.user.id;
+    res.redirect('/chat');
+  });
+
+  app.route('/chat').get(ensureAuthenticated, (req, res) => {
+    res.render(process.cwd() + '/views/pug/chat', {
+      username: req.user
+    });
   });
 
   app.use((req, res, next) => {
@@ -77,11 +84,11 @@ module.exports = function (app, myDataBase) {
 }
 
 function ensureAuthenticated(req, res, next) {
-  console.log("Before Auth");
-  console.log("req.isAuthenticated():", req.isAuthenticated());
+  //console.log("Before Auth");
+  //console.log("req.isAuthenticated():", req.isAuthenticated());
   if (req.isAuthenticated()) {
     return next();
   }
-  console.log("redirige a /");
+  //console.log("redirige a /");
   res.redirect('/');
 };
