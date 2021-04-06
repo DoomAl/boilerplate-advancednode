@@ -45,7 +45,7 @@ module.exports = function (app, myDataBase) {
   callbackURL: 'https://boilerplate-advancednode.doomal1.repl.co/auth/github/callback'
 },
   function(accessToken, refreshToken, profile, cb) {
-    console.log(profile);
+    //console.log(profile);
     //Database logic here with callback containing our user object
     myDataBase.findOneAndUpdate(
       { id: profile.id },
